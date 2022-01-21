@@ -1,0 +1,40 @@
+# U.S. Domestic Airline Project SQL Query:
+
+MySQL Queries:
+
+-- Calculated the busiest destination city and airport
+
+SELECT SUM(passengers), dest_city_name, dest_airport, unique_carrier_name, origin_city_name, orgn_airport FROM `2021 passengers-airport data` GROUP BY dest_city_name ORDER BY SUM(passengers) DESC;
+ 
+
+-- Calculated the busiest origin city and airport
+
+SELECT SUM(passengers), origin_city_name, orgn_airport, unique_carrier_name, dest_city_name, dest_airport FROM `2021 passengers-airport data` GROUP BY origin_city_name ORDER BY SUM(passengers) DESC;
+
+
+-- Calculated the busiest airlines 
+
+SELECT SUM(passengers), unique_carrier_name FROM `2021 passengers-airport data` GROUP BY unique_carrier_name ORDER BY SUM(passengers) DESC;
+
+When I ran all 3 queries and Exported it into a CSV it didn’t combine the output into one file and put each query in a separate Excel worksheet. So I had to Export each query output individually and then combine it into one Excel file manually. 
+
+
+Below is what the Passengers Data table looked like after I imported the excel file and it created the table for us automatically. 
+
+CREATE TABLE `2020 passengers data` (
+  `DEST_CITY_NAME` text,
+  `PASSENGERS` int DEFAULT NULL,
+  `DEST_AIRPORT` text,
+  `UNIQUE_CARRIER_NAME` text,
+  `ORIGIN_CITY_NAME` text,
+  `ORGN_AIRPORT` text
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
+
+-- Calculated airfare averages by airport and number of passengers
+
+SELECT SUM(2020_passengers), AVG(average_fare), AVG(inflation_adjusted_average_fare), airport_name, city_name, state_name, passenger_rank FROM `2018 airfare data` GROUP BY airport_name ORDER BY SUM(2020_passengers) DESC;
+
+-- or if you don’t want the output of the average to return decimal points add ROUND, like below. 
+
+SELECT SUM(2020_passengers), ROUND(AVG(average_fare)), ROUND(AVG(inflation_adjusted_average_fare)), airport_name, city_name, state_name, passenger_rank FROM `2018 airfare data` GROUP BY airport_name ORDER BY SUM(2020_passengers) DESC;
