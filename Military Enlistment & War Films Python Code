@@ -1,0 +1,125 @@
+# Python code for Military Enlistment & War Films released between 1980-2021:
+
+-- Below is the code to scrape IMDB war film data: 
+
+# import the libraries we need
+from bs4 import BeautifulSoup
+import requests
+import pandas as pd
+import numpy as np
+import time
+import random
+
+# declare the headers
+headers = {"Accept-language" : "en-US, en; q=0.5"}
+
+# create an empty list to append the values to
+movie_name = []
+year = []
+genre = []
+summary = []
+
+# create a pages variables to extract data from all 4 pages
+pages = np.arange(1, 833, 250)
+
+# create a for loop to get all the pages. Then create the soup variable where all the html data will be stored.
+# to avoid crashing IMDB w/all the requests include time.sleep so it can take 2 and 8 second breaks in btwn requests
+
+for page in pages:
+    page = requests.get("https://www.imdb.com/search/title/?title_type=feature&release_date=1980-01-01,2021-10-31&genres=war&countries=us&languages=en&plot=war&sort=release_date,asc&count=250&start="+str(page)+"&ref_=adv_nxt")
+    soup = BeautifulSoup(page.text, 'html.parser')
+    movie_data = soup.findAll('div', attrs={'class': 'lister-item mode-advanced'})
+    time.sleep(random.randint(2, 8))
+
+# create for loop to extract the data we need
+    for store in movie_data:
+        name = store.h3.a.text
+        movie_name.append(name)
+        print(name)
+
+        year_of_release = store.h3.find('span', class_='lister-item-year text-muted unbold').text.replace('(', '').replace(
+        ')', '')
+        year.append(year_of_release)
+        print(year_of_release)
+
+        genres = store.p.find('span', class_='genre').text
+        genre.append(genres)
+        print(genres)
+
+        summary_plot = store.find_all('p', class_='text-muted')
+        summary_ = summary_plot[1].text.replace('\n', '') if len(summary_plot) > 1 else '*****'
+        summary.append(summary_)
+        print(summary_)
+
+# create a dataframe using pandas library
+ 	   movie_DF = pd.DataFrame({"Movie Title": movie_name, "Release Year": year, "Genre": genre, "Summary":    
+    summary})
+    movie_DF.head(5)
+    print(movie_DF)
+
+# save the data in csv format
+   movie_DF.to_csv("IMDB War Films1.csv")
+
+-- Then I had to combine all 3 CSV files into one master CSV file. 
+-- Below is the code to combine all 3 CSV files into one master file:
+
+import pandas as pd
+import os
+
+# create new dataFrame to store combined csv files in
+master_df = pd.DataFrame()
+
+# create for loop to find & combine all csv files to new dataFrame "master_df"
+for file in os.listdir(os.getcwd()):
+    if file.endswith('.csv'):
+        master_df = master_df.append(pd.read_csv(file))
+        print(master_df)
+
+# save all 3 csv files into a new csv called "Master IMDB File"
+master_df.to_csv("Master IMDB File.csv", index=False)
+
+-- The next step was to clean the Master IMDB Data file. This included deleting a column called “Film Number”, that was unnecessary.
+-- Below is the code to delete a column: 
+
+import pandas as pd
+
+# create a dataframe from the csv file and read the file into our dataFrame
+df = pd.read_csv('Master IMDB File Practice.csv')
+df.head()
+
+# to delete the "Film Number" column
+df.drop(['Film Number'], axis=1, inplace=True)
+print(df)
+
+# save the output to an excel file or csv file so you see the changes in the actual file. Make sure to include the highlighted part or it will only delete the column name but not the entire column. I found this out by asking the question on stackoverflow because I was having issues.
+df.to_excel("Master IMDB File Practice New.xlsx", index=False) --- excel file
+
+df.to_csv("Master IMDB File Practice New.csv", index=False) --- or csv file
+
+-- Below is the code to remove duplicates: 
+
+import pandas as pd
+
+# create a dataframe from the csv file and read the file into our dataFrame
+df = pd.read_excel('Master IMDB File Practice New.xlsx')
+
+# to permanently remove the duplicates from the dataFrame
+df.drop_duplicates(subset='Movie Title', keep='first', inplace=True)
+print(df)
+
+# save output to an excel file or csv file
+df.to_excel("Master IMDB File Practice Clean.xlsx", index=False)
+
+-- Below is the code to remove roman numerals (aka all non-digit characters) from column “Release Year”:
+
+import pandas as pd
+
+# create a dataframe from the csv file and read the file into our dataFrame
+df = pd.read_excel('Master IMDB File Practice Clean.xlsx')
+
+# to permanently remove roman numerals from column "Release Year"
+df['Release Year'] = df['Release Year'].str.replace(r'\D',"")
+print(df)
+
+# save output to an excel file or csv file
+df.to_excel("Master IMDB File Practice Clean New.xlsx", index=False)
