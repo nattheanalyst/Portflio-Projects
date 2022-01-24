@@ -38,3 +38,7 @@ SELECT SUM(2020_passengers), AVG(average_fare), AVG(inflation_adjusted_average_f
 -- or if you don’t want the output of the average to return decimal points add ROUND, like below. 
 
 SELECT SUM(2020_passengers), ROUND(AVG(average_fare)), ROUND(AVG(inflation_adjusted_average_fare)), airport_name, city_name, state_name, passenger_rank FROM `2018 airfare data` GROUP BY airport_name ORDER BY SUM(2020_passengers) DESC;
+
+
+
+
