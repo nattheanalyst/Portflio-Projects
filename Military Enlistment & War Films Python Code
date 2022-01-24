@@ -123,3 +123,7 @@ print(df)
 
 # save output to an excel file or csv file
 df.to_excel("Master IMDB File Practice Clean New.xlsx", index=False)
+
+
+
+
